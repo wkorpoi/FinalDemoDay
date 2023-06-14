@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/itinerary.css">
+</head>
+<body>
+
+    <section class="nav-bar">
+        <h2> <a href="/profile" class="nav-1"> HOME </a></h2>
+        <h2> <a href="/booking" class="nav-2"> BOOK A TRIP </a></h2>
+        <h2> <a href="/contacts" class="nav-3"> CONTACTS </a></h2>
+        <h2> <a href="/logout"class="nav-4"> LOGOUT </a></h2>
+    </section>
+
+    <section class="trip">
+        <% itenery.forEach((trip, index) => { %> 
+            <h1> Have Fun In <%= trip.location %></h1>
+            <ul>
+                <% trip.trip.split('\n').forEach((item) => { %>
+                    <li><%= item.trim() %></li>
+                <% }) %>
+            </ul>
+        <% }) %>
+    </section>
+</body>
+</html>
