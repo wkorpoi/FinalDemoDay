@@ -1,6 +1,7 @@
 const { ObjectId } = require("mongodb");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
+import fetch from "node-fetch";
 
 module.exports = function (app, passport, db) {
   // normal routes ===============================================================
