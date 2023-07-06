@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
     button.addEventListener("click", function () {
       console.log('hi')
       fetch("/submitrequest", {
-        method: "GET",
+        method: "POST",
       })
         .then((response) => {
           if (response.ok) {

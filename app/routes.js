@@ -46,29 +46,35 @@ module.exports = function (app, passport, db) {
   });
   })
 
+  // Picture API
+
   app.get("/profile", isLoggedIn, function (req, res) {
     const pictureApi = [];
     const currentUser = req.user.local.email;
-    db.collection("trips")
-      .find({ user: currentUser })
-      .toArray(async (err, trips) => {
+  
+    db.collection("trips").find({ user: currentUser }).toArray(async (err, trips) => {
+      if (err) return console.log(err);
+  
+      for (let i = 0; i < trips.length; i++) {
+        const data = await fetch(`https://api.unsplash.com/search/photos/?page=1&query=${trips[i].destination}.&client_id=5_9_CrMvsD7kOY3XGyIzuylcKWaxUvSfDUf1tC4ldBk`);
+        const destination = await data.json();
+        pictureApi.push(destination);
+      }
+  
+      // Fetch the reviews from the database and pass them to the template
+      db.collection("reviews").find().toArray((err, reviews) => {
         if (err) return console.log(err);
-        for (let i = 0; i < trips.length; i++){
-          // let destination = await fetchPic(trips.destination)
-          const data = await fetch(`https://api.unsplash.com/search/photos/?page=1&query=${trips[i].destination}.&client_id=5_9_CrMvsD7kOY3XGyIzuylcKWaxUvSfDUf1tC4ldBk`);
-          const destination = await data.json()
-          pictureApi.push(destination)
-        }
-        console.log(pictureApi)
-
+  
         res.render("profile.ejs", {
           user: req.user,
-          trips,
-          pictureApi,
+          trips: trips,
+          pictureApi: pictureApi,
+          review: reviews  // Include the reviews variable here
         });
       });
+    });
   });
-
+  
   app.get("/itenery/:tripId", isLoggedIn, function (req, res) {
     const id = req.params.tripId
     console.log({id})
@@ -133,12 +139,61 @@ app.get('/trips/:id', isLoggedIn, function (req, res) {
   }
 });
 
+// invite friend
+
   app.post("/invite/:tripId", isLoggedIn, function (req, res) {
     const tripId = req.params.tripId;
     const invitedFriend = req.body.invitedFriend;
     // go to the contacts collection, find the invited friend, go to the trips collection, find the specific trip with the tripId, then send a text to the friend that includes that trip data
-    res.redirect("/contacts");
-  });
+    const currentUser = req.user.local.email;
+    const collection = db.collection("contacts")
+    const query = {_id : ObjectId (req.params.tripId)}
+    const phoneNumber = req.user.local.phoneNumber
+
+    fetch(API_ENDPOINT, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(data),
+    })
+      .then(response => response.json())
+      .then(result => {
+        try {
+          const googleKey = process.env.GOOGLE_PASSWORD
+          var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            auth: {
+              user: 'wadiyakorpoi@gmail.com',
+              pass: googleKey
+            }
+          });
+          var mailOptions = {
+            from: 'wadiyakorpoi@gmail.com',
+            to: invitedFriend,
+            subject: 'Your My Travel Guru Itinerary',
+            text: `Here is your itinerary from The Travel Guru: ${newTrip}`
+          };
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Saved! ' + info.response);
+            }
+          });
+        } catch (err) {
+          console.log(err);
+        }
+        res.redirect('back');
+      })
+  
+      .catch(error => {
+        // Handle error
+        console.error(error);
+      });
+      
+        });
 
   // LOGOUT ==============================
   app.get("/logout", function (req, res) {
@@ -166,6 +221,36 @@ app.get('/trips/:id', isLoggedIn, function (req, res) {
       }
     );
   });
+
+  app.post("/profile", (req, response) => {
+    db.collection("review").insertOne(
+      {
+        review: req.body.review,
+        rating: req.body.rating
+      },
+      (err, result) => {
+        if (err) return console.log(err);
+        console.log("saved to database");
+        // let destinationId = result.insertedId;
+        // response.redirect("/trips/" + destinationId);
+      }
+    );
+  });
+
+  app.put('/edit', (req, res) => {
+    db.collection('review')
+    .findOneAndUpdate({_id:ObjectId(req.body._id)}, {
+      $set: {
+      review:req.body.newText
+      }
+    }, {
+      sort: {_id: -1},
+      upsert: true
+    }, (err, result) => {
+      if (err) return res.send(err)
+      res.send(result)
+    })
+  })
 
   app.get("/submitrequest/:tripId", isLoggedIn, async function (req, res) {
     const currentUser = req.user.local.email;
@@ -238,8 +323,8 @@ app.get('/trips/:id', isLoggedIn, function (req, res) {
         var mailOptions = {
           from: 'wadiyakorpoi@gmail.com',
           to: req.user.local.email,
-          subject: 'Your My Travel Guru Itinery',
-          text: `Here is your itinery from The Travel Guru ${newTrip}`
+          subject: 'Your My Travel Guru Itinerary',
+          text: `Here is your itinerary from The Travel Guru: ${newTrip}`
         };
         transporter.sendMail(mailOptions, function(error, info){
           if (error) {
@@ -251,7 +336,7 @@ app.get('/trips/:id', isLoggedIn, function (req, res) {
       } catch (err) {
         console.log(err);
       }
-      res.redirect(`/itenery/:${tripId}`);
+      res.redirect('back');
     })
 
     .catch(error => {
@@ -260,6 +345,7 @@ app.get('/trips/:id', isLoggedIn, function (req, res) {
     });
     
       });
+
 // TarGET ITEN ID
 
   app.post("/addFriend", (req, res) => {

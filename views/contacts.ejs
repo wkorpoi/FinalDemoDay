@@ -13,7 +13,7 @@
     </div>
 
     <section class="nav-bar">
-        <h2> <a href="/profile" class="nav-1">Trip</a></h2>
+        <h2> <a href="profile" class="nav-1">Trip</a></h2>
         <h2> <a href="/booking" class="nav-2">Book a Trip </a></h2>
         <h2> <a href="/contacts" class="nav-3">Contacts </a></h2>
         <h2> <a href="/logout"class="nav-4">Logout </a></h2>
@@ -29,10 +29,10 @@
                             <div class="form-group">
                                 <form action="/addFriend" method="POST">
                                 <label for="friendName">Friend Name</label>
-                                <input type="text" class="form-control mb-4" id="friendName" name="name" placeholder="You Friend name"
+                                <input type="text" class="form-control mb-4" id="friendName" name="name" placeholder="You Friend's Name"
                                     required>
-                                    <label for="number">Phone Number</label>
-                                    <input type="text" class="form-control mb-4" id="number" name="number" placeholder="Friend's Phone Number"
+                                    <label for="text">Email</label>
+                                    <input type="text" class="form-control mb-4" id="number" name="number" placeholder="Friend's Email"
                                     required>
                             </div>
                             <button type="submit" class="add btn btn-info btn-block mt-3">Add to list</button>
@@ -48,7 +48,7 @@
                                 <li class="friendName"><%= contacts[i].friendName%></li>
                                 <li class="friendNumber"> 
                                     <input class= "phoneNumber" data-id="<%= contacts[i].phoneNumber%>" type="text" value="<%= contacts[i].phoneNumber%>" name="phoneNumber" required="true"> 
-                                <button class="editButton" value="<%= contacts[i].phoneNumber%>"> ✏️ </button>  
+                                <button class="editButton" value="<%= contacts[i].phoneNumber%>"> EDIT </button>  
                                 </li>
                             <%}%>
                           

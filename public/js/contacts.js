@@ -1,9 +1,30 @@
-const buttons = document.querySelectorAll('.editButton')
 
-buttons.forEach( button => 
-    button.addEventListener('click', startEditing)
+const editButton = document.querySelectorAll('.editButton')
+
+Array.from(editButton).forEach( button => 
+    console.log('im working'),
+    button.addEventListener('click', function(e){
+        const input = e.target.parentNode.childNodes[1]
+        input.select()
+        input.focus()
+        input.readOnly = false
+        const newNumber = input
+        console.log(input)
+    
+        fetch("/contacts", {
+            method: "PUT",
+          })
+            .then((response) => {
+              if (response.ok) {
+                console.log("Contact Edited");
+              } else {
+                console.error("Error sending message:", response.statusText);
+              }
+            })
+            .catch((error) => console.error("Error sending message:", error));
+    }
+    )
 )
-console.log(buttons)
 
 // made the input highlight
 function startEditing(e) {
@@ -11,13 +32,28 @@ function startEditing(e) {
     input.select()
     input.focus()
     input.readOnly = false
+    const newNumber = input
     console.log(input)
+
+    fetch("/contacts", {
+        method: "PUT",
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log("Contact Edited");
+          } else {
+            console.error("Error sending message:", response.statusText);
+          }
+        })
+        .catch((error) => console.error("Error sending message:", error));
 }
 
 // listen for a change in the input, and everytime its been changed store in a variable. 
 
 const newNumber = 
 const id = 
+
+
 
 // grab the data attriubute that was stored in the button.
 
